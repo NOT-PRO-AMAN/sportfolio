@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sportfolio/components/button.dart';
 import 'package:sportfolio/components/text_feild.dart';
@@ -15,6 +16,41 @@ class _LoginPageState extends State<LoginPage> {
   //text editing controller
   final emailTextController = TextEditingController();
   final passwordTextController = TextEditingController();
+
+  void signIn() async{
+    //loading
+    showDialog(context: context,
+    builder: (context) => const Center(
+      child: CircularProgressIndicator(),
+    ),
+    );
+
+
+
+
+    try{
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: emailTextController.text,
+      password: passwordTextController.text);
+
+      //pop loading circle
+      if (context.mounted) Navigator.pop(context);
+
+    } on FirebaseAuthException catch (e){
+      //pop
+      Navigator.pop(context);
+      displayMessage(e.code);
+    }
+  }
+
+  //display msg
+  void displayMessage (String message) {
+    showDialog(context: context, builder: (context) => 
+    AlertDialog(
+      title: Text(message),
+    ),
+    );
+  }
 
 
   @override
@@ -66,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 10,),
             
                 //sign in
-                MyButton(onTap: () {},
+                MyButton(onTap: signIn,
                 text: 'Sign In'),
 
                 const SizedBox(height: 10,),
