@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> {
       // Navigate to Profile Page
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const ProfilePage()),
+        MaterialPageRoute(builder: (context) => ProfilePage()),
       );
     } else {
       setState(() {
