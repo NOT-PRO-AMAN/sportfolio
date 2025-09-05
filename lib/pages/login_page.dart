@@ -12,31 +12,26 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   //text editing controller
   final emailTextController = TextEditingController();
   final passwordTextController = TextEditingController();
 
-  void signIn() async{
+  void signIn() async {
     //loading
-    showDialog(context: context,
-    builder: (context) => const Center(
-      child: CircularProgressIndicator(),
-    ),
+    showDialog(
+      context: context,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
-
-
-
-    try{
+    try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailTextController.text,
-      password: passwordTextController.text);
+        email: emailTextController.text,
+        password: passwordTextController.text,
+      );
 
       //pop loading circle
       if (context.mounted) Navigator.pop(context);
-
-    } on FirebaseAuthException catch (e){
+    } on FirebaseAuthException catch (e) {
       //pop
       Navigator.pop(context);
       displayMessage(e.code);
@@ -44,14 +39,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   //display msg
-  void displayMessage (String message) {
-    showDialog(context: context, builder: (context) => 
-    AlertDialog(
-      title: Text(message),
-    ),
+  void displayMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(title: Text(message)),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -65,67 +58,59 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // logo
-                Icon(Icons.lock,
-                size: 100,
+                Image.asset(
+                  'assets/sportfolio_icon.png',
+                  height: 150,
                 ),
-            
-                const SizedBox(height: 35,),
+
+                const SizedBox(height: 35),
                 //welcome
-                Text(
-                  "Welcome to Sportfolio"
-                ),
-            
-                const SizedBox(height: 30,),
-            
-            
+                Text("Welcome to Sportfolio"),
+
+                const SizedBox(height: 30),
+
                 //email
                 MyTextField(
-                  controller: emailTextController, 
-                  hintText: 'Email', 
-                  obscureText: false
-                  ),
+                  controller: emailTextController,
+                  hintText: 'Email',
+                  obscureText: false,
+                ),
 
+                const SizedBox(height: 15),
 
-
-                  const SizedBox(height: 15,),
-                
-            
-            
                 //passwoed
                 MyTextField(
-                  controller: passwordTextController, 
-                  hintText: 'Password', 
-                  obscureText: true
-                  ),
-            
-            
-                const SizedBox(height: 10,),
-            
-                //sign in
-                MyButton(onTap: signIn,
-                text: 'Sign In'),
+                  controller: passwordTextController,
+                  hintText: 'Password',
+                  obscureText: true,
+                ),
 
-                const SizedBox(height: 10,),
-          
+                const SizedBox(height: 10),
+
+                //sign in
+                MyButton(onTap: signIn, text: 'Sign In'),
+
+                const SizedBox(height: 10),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("New user?"),
-                    const SizedBox(width: 4,),
+                    const SizedBox(width: 4),
                     GestureDetector(
                       onTap: widget.onTap,
-                      child: Text("Register here",style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue[300],
-                      ),),
+                      child: Text(
+                        "Register here",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue[300],
+                        ),
+                      ),
                     ),
                   ],
                 ),
 
-            
                 //register
-
               ],
             ),
           ),

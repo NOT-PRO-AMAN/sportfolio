@@ -19,141 +19,131 @@ class _RegisterPageState extends State<RegisterPage> {
   final confirmPasswordController = TextEditingController();
 
   //display msg
-  void displayMessage (String message) {
-    showDialog(context: context, builder: (context) => 
-    AlertDialog(
-      title: Text(message),
-    ),
+  void displayMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(message),
+      ),
     );
   }
 
   //signup
-  void signUp () async {
-
+  void signUp() async {
     //show loading
-    showDialog(context: context,
-    builder: (context) => const Center(
-      child: CircularProgressIndicator(),
-    ),
+    showDialog(
+      context: context,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
     );
 
     //make sure password match
-    if (passwordTextController.text != confirmPasswordController.text){
+    if (passwordTextController.text != confirmPasswordController.text) {
       //pop loading
       Navigator.pop(context);
       displayMessage("Password don't match");
       return;
     }
-    // try creating the user
 
-    //try catch
-    try{
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailTextController.text, 
+    //try creating the user
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailTextController.text,
         password: passwordTextController.text,
-        );
+      );
 
-        //after creating the user, create a new document in the firebase called users
-        FirebaseFirestore.instance.collection("Users").
-        doc(userCredential.user!.email)
-        .set({
-          'username' : emailTextController.text.split('@')[0],
-          'bio' : "Empty bio..",
-        });
+      //after creating the user, create a new document in firestore
+      FirebaseFirestore.instance.collection("Users").doc(userCredential.user!.email).set({
+        'username': emailTextController.text.split('@')[0],
+        'bio': "Empty bio..",
+      });
 
-
-
-        if (context.mounted) Navigator.pop(context);
-    } on FirebaseAuthException catch (e){
+      if (context.mounted) Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       displayMessage(e.code);
     }
-
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true, // 👈 Important fix
       backgroundColor: Colors.grey[300],
       body: SafeArea(
         child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // logo
-                Icon(Icons.lock,
-                size: 100,
+          child: SingleChildScrollView( // 👈 Prevents bottom overflow
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // logo
+                  Image.asset(
+                  'assets/sportfolio_icon.png',
+                  height: 150,
                 ),
-            
-                const SizedBox(height: 35,),
-                //welcome
-                Text(
-                  "Let's create an account"
-                ),
-            
-                const SizedBox(height: 30,),
-            
-            
-                //email
-                MyTextField(
-                  controller: emailTextController, 
-                  hintText: 'Email', 
-                  obscureText: false
-                  ),
 
+                  const SizedBox(height: 35),
+                  //welcome
+                  Text("Let's create an account"),
 
+                  const SizedBox(height: 30),
 
-                  const SizedBox(height: 15,),
-                
-            
-            
-                //passwoed
-                MyTextField(
-                  controller: passwordTextController, 
-                  hintText: 'Password', 
-                  obscureText: true
-                  ),
-
-                  const SizedBox(height: 15,),
-
+                  //email
                   MyTextField(
-                  controller: confirmPasswordController, 
-                  hintText: 'Confirm Password', 
-                  obscureText: true
+                    controller: emailTextController,
+                    hintText: 'Email',
+                    obscureText: false,
                   ),
-            
-            
-                const SizedBox(height: 10,),
-            
-                //sign up
-                MyButton(onTap: signUp,
-                text: 'Sign Up'),
 
-                const SizedBox(height: 10,),
-          
+                  const SizedBox(height: 15),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Already have an account?"),
-                    const SizedBox(width: 4,),
-                    GestureDetector(
-                      onTap: widget.onTap,
-                      child: Text("Sign In now",style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue[300],
-                      ),),
-                    ),
-                  ],
-                ),
+                  //password
+                  MyTextField(
+                    controller: passwordTextController,
+                    hintText: 'Password',
+                    obscureText: true,
+                  ),
 
-            
-                //register
+                  const SizedBox(height: 15),
 
-              ],
+                  //confirm password
+                  MyTextField(
+                    controller: confirmPasswordController,
+                    hintText: 'Confirm Password',
+                    obscureText: true,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  //sign up button
+                  MyButton(onTap: signUp, text: 'Sign Up'),
+
+                  const SizedBox(height: 20),
+
+                  // already have an account?
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Already have an account?"),
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: widget.onTap,
+                        child: Text(
+                          "Sign In now",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue[300],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
