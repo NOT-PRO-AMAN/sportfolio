@@ -18,29 +18,29 @@ class _HomePageState extends State<HomePage> {
   // Dummy posts with images from assets
   final List<Map<String, dynamic>> _dummyPosts = [
     {
-      "username": "cricket_fan99",
+      "username": "@Ketan_K18",
       "image": "assets/test1.jpg",
-      "title": "Exciting cricket match today!"
+      "title": "Victory tastes sweet! Won the cricket match today!....."
     },
     {
-      "username": "football_lover",
-      "image": "assets/test1.jpg",
-      "title": "Scored a winning goal ⚽🔥"
+      "username": "@anshika_002",
+      "image": "assets/test2.jpg",
+      "title": "Excited to share that I got 2nd position in long jump."
     },
     {
-      "username": "basketball_pro",
-      "image": "assets/test1.jpg",
-      "title": "Dunk of the day 🏀"
+      "username": "@daksh_kandpal",
+      "image": "assets/test3.jpg",
+      "title": "Hardwork give you victory !"
     },
     {
-      "username": "swimmer_girl",
-      "image": "assets/test1.jpg",
-      "title": "Training for nationals 🏊‍♀️"
+      "username": "@ind_sports",
+      "image": "assets/test4.jpg",
+      "title": "Khelo India programme is the new trend"
     },
     {
-      "username": "runner_dude",
-      "image": "assets/test1.jpg",
-      "title": "5k morning run 🏃‍♂️"
+      "username": "@keral_basketball_hub",
+      "image": "assets/test5.jpg",
+      "title": "Our boys dominated the tournament."
     },
   ];
 
