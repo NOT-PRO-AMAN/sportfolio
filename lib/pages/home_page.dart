@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'profile_page.dart'; // Import the profile page
+import 'profile_page.dart';
+import 'clubs_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,9 +12,39 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0; // To keep track of bottom nav selection
+  int _selectedIndex = 0;
+  final TextEditingController _searchController = TextEditingController();
 
-  // Show logout confirmation dialog
+  // Dummy posts with images from assets
+  final List<Map<String, dynamic>> _dummyPosts = [
+    {
+      "username": "cricket_fan99",
+      "image": "assets/test1.jpg",
+      "title": "Exciting cricket match today!"
+    },
+    {
+      "username": "football_lover",
+      "image": "assets/test1.jpg",
+      "title": "Scored a winning goal ⚽🔥"
+    },
+    {
+      "username": "basketball_pro",
+      "image": "assets/test1.jpg",
+      "title": "Dunk of the day 🏀"
+    },
+    {
+      "username": "swimmer_girl",
+      "image": "assets/test1.jpg",
+      "title": "Training for nationals 🏊‍♀️"
+    },
+    {
+      "username": "runner_dude",
+      "image": "assets/test1.jpg",
+      "title": "5k morning run 🏃‍♂️"
+    },
+  ];
+
+  // Logout dialog
   void _showLogoutDialog() {
     showDialog(
       context: context,
@@ -22,20 +54,15 @@ class _HomePageState extends State<HomePage> {
           content: const Text("Are you sure you want to logout?"),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the dialog
-              },
+              onPressed: () => Navigator.pop(context),
               child: const Text("No"),
             ),
             TextButton(
               onPressed: () {
                 FirebaseAuth.instance.signOut();
-                Navigator.pop(context); // Close the dialog
+                Navigator.pop(context);
               },
-              child: const Text(
-                "Yes",
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text("Yes", style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -43,41 +70,146 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Handle bottom navigation taps
-  void _onItemTapped(int index) {
-    if (index == 1) {
-      // Navigate to Profile Page
+  // Search user by email
+  void _searchUser() async {
+    String email = _searchController.text.trim();
+    if (email.isEmpty) return;
+
+    final doc = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(email)
+        .get();
+
+    if (doc.exists) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ProfilePage()),
+        MaterialPageRoute(
+          builder: (context) => ProfilePageViewOnly(userEmail: email),
+        ),
       );
     } else {
-      setState(() {
-        _selectedIndex = index; // Stay on Home
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User not found")),
+      );
     }
+  }
+
+  final List<Widget> _pages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _pages.addAll([
+      // Home Page
+      Scaffold(
+        backgroundColor: Colors.grey[200],
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 22, 94, 153),
+          title: const Text("Sportfolio"),
+          actions: [
+            IconButton(
+              onPressed: _showLogoutDialog,
+              icon: const Icon(Icons.logout),
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            // 🔍 Search bar
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: "Search by email",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        prefixIcon: const Icon(Icons.search),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: _searchUser,
+                    child: const Text("Search"),
+                  ),
+                ],
+              ),
+            ),
+
+            // 🏟 Posts feed
+            Expanded(
+              child: ListView.builder(
+                itemCount: _dummyPosts.length,
+                itemBuilder: (context, index) {
+                  final post = _dummyPosts[index];
+                  return Card(
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Username
+                          Text(
+                            post["username"],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Post image (16:9 aspect ratio)
+                          AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                post["image"],
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Post title
+                          Text(
+                            post["title"],
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      const ProfilePage(),
+      const ClubsPage(),
+    ]);
+  }
+
+  void _onItemTapped(int index) {
+    setState(() => _selectedIndex = index);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200], // Light grey background
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 22, 94, 153),
-        title: const Text("Sportfolio"),
-        actions: [
-          IconButton(
-            onPressed: _showLogoutDialog, // Now opens a pop-up
-            icon: const Icon(Icons.logout_outlined),
-          ),
-        ],
-      ),
-      body: const Center(
-        child: Text(
-          "Welcome to Sportfolio Home!",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
+      body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         selectedItemColor: const Color.fromARGB(255, 22, 94, 153),
@@ -85,15 +217,56 @@ class _HomePageState extends State<HomePage> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Profile",
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.sports), label: "Clubs"),
         ],
+      ),
+    );
+  }
+}
+
+// View-only profile page
+class ProfilePageViewOnly extends StatelessWidget {
+  final String userEmail;
+  const ProfilePageViewOnly({super.key, required this.userEmail});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("$userEmail's Profile"),
+        backgroundColor: const Color.fromARGB(255, 22, 94, 153),
+      ),
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection("Users")
+            .doc(userEmail)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final userData = snapshot.data!.data() as Map<String, dynamic>;
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                const Icon(Icons.person, size: 72),
+                const SizedBox(height: 12),
+                Text(
+                  userEmail,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 12),
+                Text("Username: ${userData["username"] ?? ""}"),
+                const SizedBox(height: 8),
+                Text("Bio: ${userData["bio"] ?? ""}"),
+              ],
+            );
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
       ),
     );
   }
