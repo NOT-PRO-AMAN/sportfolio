@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ClubsPage extends StatelessWidget {
   const ClubsPage({super.key});
@@ -16,7 +17,14 @@ class ClubsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sports Clubs"),
+        title: Text(
+          'Clubs',
+          style: GoogleFonts.merriweather(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
         backgroundColor: const Color.fromARGB(255, 22, 94, 153),
       ),
       body: ListView.builder(

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'profile_page.dart';
 import 'clubs_page.dart';
 
@@ -44,32 +44,6 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
-  // Logout dialog
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Logout"),
-          content: const Text("Are you sure you want to logout?"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("No"),
-            ),
-            TextButton(
-              onPressed: () {
-                FirebaseAuth.instance.signOut();
-                Navigator.pop(context);
-              },
-              child: const Text("Yes", style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   // Search user by email
   void _searchUser() async {
     String email = _searchController.text.trim();
@@ -105,13 +79,14 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 22, 94, 153),
-          title: const Text("Sportfolio"),
-          actions: [
-            IconButton(
-              onPressed: _showLogoutDialog,
-              icon: const Icon(Icons.logout),
-            ),
-          ],
+          title: Text(
+          'Sportfolio',
+          style: GoogleFonts.merriweather(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
         ),
         body: Column(
           children: [

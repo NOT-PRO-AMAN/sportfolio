@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sportfolio/components/text_box.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -31,10 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 FirebaseAuth.instance.signOut();
                 Navigator.pop(context); // Close dialog
               },
-              child: const Text(
-                "Yes",
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text("Yes", style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -53,9 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: InputDecoration(
-            hintText: "Enter new $field",
-          ),
+          decoration: InputDecoration(hintText: "Enter new $field"),
         ),
         actions: [
           TextButton(
@@ -101,28 +97,33 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               TextField(
                 controller: opponentTeamController,
-                decoration:
-                    const InputDecoration(hintText: "Opponent Team Name"),
+                decoration: const InputDecoration(
+                  hintText: "Opponent Team Name",
+                ),
               ),
               TextField(
                 controller: dateController,
-                decoration:
-                    const InputDecoration(hintText: "Date (YYYY-MM-DD)"),
+                decoration: const InputDecoration(
+                  hintText: "Date (YYYY-MM-DD)",
+                ),
               ),
               TextField(
                 controller: resultController,
-                decoration:
-                    const InputDecoration(hintText: "Result (Won/Lost)"),
+                decoration: const InputDecoration(
+                  hintText: "Result (Won/Lost)",
+                ),
               ),
               TextField(
                 controller: sportController,
-                decoration:
-                    const InputDecoration(hintText: "Sport (e.g., Football)"),
+                decoration: const InputDecoration(
+                  hintText: "Sport (e.g., Football)",
+                ),
               ),
               TextField(
                 controller: playedForController,
                 decoration: const InputDecoration(
-                    hintText: "Played For (My Team / Opponent)"),
+                  hintText: "Played For (My Team / Opponent)",
+                ),
               ),
             ],
           ),
@@ -160,8 +161,8 @@ class _ProfilePageState extends State<ProfilePage> {
           .collection("Users")
           .doc(currentuser.email)
           .update({
-        "pastMatches": FieldValue.arrayUnion([match])
-      });
+            "pastMatches": FieldValue.arrayUnion([match]),
+          });
     }
   }
 
@@ -171,8 +172,8 @@ class _ProfilePageState extends State<ProfilePage> {
         .collection("Users")
         .doc(currentuser.email)
         .update({
-      "pastMatches": FieldValue.arrayRemove([match])
-    });
+          "pastMatches": FieldValue.arrayRemove([match]),
+        });
   }
 
   @override
@@ -181,10 +182,17 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 22, 94, 153),
-        title: const Text("My Profile"),
+        title: Text(
+          'Profile',
+          style: GoogleFonts.merriweather(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout_outlined),
+            icon: const Icon(Icons.logout_outlined, color: Colors.black),
             onPressed: _showLogoutDialog,
           ),
         ],
@@ -254,13 +262,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           scrollDirection: Axis.horizontal,
                           itemCount: pastMatches.length,
                           itemBuilder: (context, index) {
-                            final match =
-                                Map<String, dynamic>.from(pastMatches[index]);
+                            final match = Map<String, dynamic>.from(
+                              pastMatches[index],
+                            );
 
                             return Container(
                               width: 240,
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 8),
+                              margin: const EdgeInsets.symmetric(horizontal: 8),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -274,8 +282,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ],
                               ),
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Row(
@@ -293,10 +300,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ),
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.delete,
-                                            color: Colors.red),
-                                        onPressed: () =>
-                                            deletePastMatch(match),
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () => deletePastMatch(match),
                                       ),
                                     ],
                                   ),
@@ -307,15 +315,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                   const SizedBox(height: 6),
                                   Text("Sport: ${match["sport"] ?? "N/A"}"),
                                   const SizedBox(height: 6),
-                                  Text("I played for: ${match["playedFor"] ?? "N/A"}"),
+                                  Text(
+                                    "I played for: ${match["playedFor"] ?? "N/A"}",
+                                  ),
                                 ],
                               ),
                             );
                           },
                         )
-                      : const Center(
-                          child: Text("No past matches available"),
-                        ),
+                      : const Center(child: Text("No past matches available")),
                 ),
               ],
             );
