@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sportfolio/components/button.dart';
 import 'package:sportfolio/components/text_feild.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -13,12 +13,29 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  //text editing controller
+  // Text editing controllers
   final emailTextController = TextEditingController();
   final passwordTextController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  //display msg
+  // State/Region list
+  final List<String> states = [
+    'Maharashtra',
+    'Karnataka',
+    'Delhi',
+    'Uttar Pradesh',
+    'Tamil Nadu',
+    'Gujarat',
+    'West Bengal',
+    'Rajasthan',
+    'Punjab',
+    'Kerala',
+    'Haryana', // Added Haryana
+  ];
+
+  String? selectedState; // Selected state
+
+  // Display message dialog
   void displayMessage(String message) {
     showDialog(
       context: context,
@@ -28,39 +45,46 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  //signup
+  // Sign up method
   void signUp() async {
-    //show loading
-    showDialog(
-      context: context,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-
-    //make sure password match
-    if (passwordTextController.text != confirmPasswordController.text) {
-      //pop loading
-      Navigator.pop(context);
-      displayMessage("Password don't match");
+    // Check if state is selected
+    if (selectedState == null) {
+      displayMessage("Please select your state/region");
       return;
     }
 
-    //try creating the user
+    // Show loading indicator
+    showDialog(
+      context: context,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    // Make sure passwords match
+    if (passwordTextController.text != confirmPasswordController.text) {
+      Navigator.pop(context); // Remove loading
+      displayMessage("Passwords don't match");
+      return;
+    }
+
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      // Create user
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
         email: emailTextController.text,
         password: passwordTextController.text,
       );
 
-      //after creating the user, create a new document in firestore
-      FirebaseFirestore.instance.collection("Users").doc(userCredential.user!.email).set({
+      // Save user details in Firestore
+      await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(userCredential.user!.email)
+          .set({
         'username': emailTextController.text.split('@')[0],
         'bio': "Empty bio..",
+        'region': selectedState,
       });
 
-      if (context.mounted) Navigator.pop(context);
+      if (context.mounted) Navigator.pop(context); // Close loading
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       displayMessage(e.code);
@@ -70,80 +94,100 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true, // 👈 Important fix
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.grey[300],
       body: SafeArea(
         child: Center(
-          child: SingleChildScrollView( // 👈 Prevents bottom overflow
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // logo
-                  Image.asset(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Logo
+                Image.asset(
                   'assets/sportfolio_icon.png',
                   height: 150,
                 ),
+                const SizedBox(height: 35),
 
-                  const SizedBox(height: 35),
-                  //welcome
-                  Text("Let's create an account"),
+                // Welcome text
+                const Text("Let's create an account",
+                    style: TextStyle(fontSize: 18)),
 
-                  const SizedBox(height: 30),
+                const SizedBox(height: 30),
 
-                  //email
-                  MyTextField(
-                    controller: emailTextController,
-                    hintText: 'Email',
-                    obscureText: false,
+                // Email field
+                MyTextField(
+                  controller: emailTextController,
+                  hintText: 'Email',
+                  obscureText: false,
+                ),
+                const SizedBox(height: 15),
+
+                // Password field
+                MyTextField(
+                  controller: passwordTextController,
+                  hintText: 'Password',
+                  obscureText: true,
+                ),
+                const SizedBox(height: 15),
+
+                // Confirm Password field
+                MyTextField(
+                  controller: confirmPasswordController,
+                  hintText: 'Confirm Password',
+                  obscureText: true,
+                ),
+                const SizedBox(height: 20),
+
+                // State/Region dropdown
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: "Select your state/region",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
+                  value: selectedState,
+                  items: states.map((state) {
+                    return DropdownMenuItem(
+                      value: state,
+                      child: Text(state),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedState = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
 
-                  const SizedBox(height: 15),
+                // Sign Up button
+                MyButton(onTap: signUp, text: 'Sign Up'),
+                const SizedBox(height: 20),
 
-                  //password
-                  MyTextField(
-                    controller: passwordTextController,
-                    hintText: 'Password',
-                    obscureText: true,
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  //confirm password
-                  MyTextField(
-                    controller: confirmPasswordController,
-                    hintText: 'Confirm Password',
-                    obscureText: true,
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  //sign up button
-                  MyButton(onTap: signUp, text: 'Sign Up'),
-
-                  const SizedBox(height: 20),
-
-                  // already have an account?
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Already have an account?"),
-                      const SizedBox(width: 4),
-                      GestureDetector(
-                        onTap: widget.onTap,
-                        child: Text(
-                          "Sign In now",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue[300],
-                          ),
+                // Already have an account?
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Already have an account?"),
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      onTap: widget.onTap,
+                      child: Text(
+                        "Sign In now",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue[300],
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

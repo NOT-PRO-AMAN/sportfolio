@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'profile_page.dart';
-import 'clubs_page.dart';
+import 'region_page.dart';
+import 'dash_userprofile_page.dart';
+import 'updates_page.dart'; // <-- Import new updates page
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -49,16 +52,14 @@ class _HomePageState extends State<HomePage> {
     String email = _searchController.text.trim();
     if (email.isEmpty) return;
 
-    final doc = await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(email)
-        .get();
+    final doc =
+        await FirebaseFirestore.instance.collection("Users").doc(email).get();
 
     if (doc.exists) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ProfilePageViewOnly(userEmail: email),
+          builder: (context) => DashUserProfilePage(userId: email),
         ),
       );
     } else {
@@ -80,13 +81,26 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 22, 94, 153),
           title: Text(
-          'Sportfolio',
-          style: GoogleFonts.merriweather(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+            'Sportfolio',
+            style: GoogleFonts.merriweather(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
-        ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.notifications),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const UpdatesPage(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
         body: Column(
           children: [
@@ -133,7 +147,6 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Username
                           Text(
                             post["username"],
                             style: const TextStyle(
@@ -142,8 +155,6 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           const SizedBox(height: 8),
-
-                          // Post image (16:9 aspect ratio)
                           AspectRatio(
                             aspectRatio: 16 / 9,
                             child: ClipRRect(
@@ -155,8 +166,6 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           const SizedBox(height: 8),
-
-                          // Post title
                           Text(
                             post["title"],
                             style: const TextStyle(fontSize: 14),
@@ -173,7 +182,7 @@ class _HomePageState extends State<HomePage> {
       ),
 
       const ProfilePage(),
-      const ClubsPage(),
+      const RegionalDashboardPage(),
     ]);
   }
 
@@ -194,54 +203,9 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-          BottomNavigationBarItem(icon: Icon(Icons.sports), label: "Clubs"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.public), label: "Regional Dashboard"),
         ],
-      ),
-    );
-  }
-}
-
-// View-only profile page
-class ProfilePageViewOnly extends StatelessWidget {
-  final String userEmail;
-  const ProfilePageViewOnly({super.key, required this.userEmail});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("$userEmail's Profile"),
-        backgroundColor: const Color.fromARGB(255, 22, 94, 153),
-      ),
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection("Users")
-            .doc(userEmail)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final userData = snapshot.data!.data() as Map<String, dynamic>;
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                const Icon(Icons.person, size: 72),
-                const SizedBox(height: 12),
-                Text(
-                  userEmail,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 12),
-                Text("Username: ${userData["username"] ?? ""}"),
-                const SizedBox(height: 8),
-                Text("Bio: ${userData["bio"] ?? ""}"),
-              ],
-            );
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          }
-          return const Center(child: CircularProgressIndicator());
-        },
       ),
     );
   }
