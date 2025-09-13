@@ -1,16 +1,33 @@
-# sportfolio
+🏆 Sportfolio
 
-A new Flutter project.
+A personal sports portfolio platform where users can showcase their achievements, track progress, and explore sports data in a modern and interactive way.
 
-## Getting Started
+🚀 Overview
 
-This project is a starting point for a Flutter application.
+Sportfolio is designed to give athletes, students, and sports enthusiasts a digital space to highlight their journey. With a clean interface and intuitive features, it acts as a portfolio + tracker, making it easier to organize and share sports-related accomplishments.
 
-A few resources to get you started if this is your first Flutter project:
+✨ Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+📌 Create and manage your personal sports profile
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+🏅 Showcase achievements, matches, and milestones
+
+📊 Track stats and progress over time
+
+🌍 Regional Dashboard – view insights and comparisons based on regions (e.g., state, country, or global level)
+
+🎨 Responsive and user-friendly UI
+
+🔐 Login and user profile system (planned)
+
+🎮 Integration with sports/game data (future scope: ~500 games dataset)
+
+🛠️ Tech Stack
+
+Frontend: Flutter (cross-platform support)
+
+Backend: Firebase / (Planned) Custom API
+
+Database: Firestore (planned for storing user/game data)
+
+Analytics/Dashboard: Flutter Charts + Firebase/Custom API
