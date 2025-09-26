@@ -182,7 +182,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 ),
                 child: _isUploading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Upload"),
+                    : const Text("Upload", style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
